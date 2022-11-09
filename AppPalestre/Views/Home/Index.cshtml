@@ -1,0 +1,113 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="">
+    @{
+        foreach (AppPalestre.Controllers.HomeController.Giorno giorno in ViewBag.Giorni)
+        {
+            <h3 class="text-primary mt-2">@giorno.Datas</h3>
+            @foreach (AppPalestre.Controllers.HomeController.Corso corso in giorno.Corsi)
+            {
+                <div id="@corso.Id" class="bg-light">
+                    <div><h5 class="mb-0 mt-2">@corso.Nome</h5></div>
+                    <div>dalle @corso.Inizio alle @corso.Fine</div>
+                    <div class="divbtnelimina @(corso.IsPrenotato ? "d-none" : "")">
+                        <input idcorso="@corso.Id" datacorso="@giorno.Data" type="button" class="btnElimina btn btn-danger" value="ELIMINA" />
+                    </div>
+                    <div class="divbtnprenota @(corso.IsPrenotato ? "d-none" : "")">
+                        <input idcorso="@corso.Id" datacorso="@giorno.Data" type="button" class="btnPrenota btn btn-success" value="PRENOTA" />
+                    </div>
+                </div>
+            }
+        }
+    }
+</div>
+
+<script type="text/javascript">
+
+    var timer = null;
+    $(document).ready(function () {
+
+        $('.btnPrenota').click(function (e) {
+            e.preventDefault();
+
+            if (timer != null) {
+                if ($(this).val() == "IN PRENOTAZIONE") {
+                    clearInterval(timer);
+                    timer = null;
+                    $(this).removeClass("btn-warning").addClass("btn-success").val("PRENOTA");
+                    return false;
+                } else {
+                    return false;
+                }
+            }
+
+            $(this).removeClass("btn-success").addClass("btn-warning").val("IN PRENOTAZIONE");
+
+            var idcorso = $(this).attr("idcorso");
+            var datacorso = $(this).attr("datacorso");
+            //var ret = Prenota(idcorso, datacorso);
+            timer = setInterval(function () { Prenota(idcorso, datacorso) }, 1000);
+
+        });
+
+        $('.btnElimina').click(function (e) {
+            e.preventDefault();
+
+            var idcorso = $(this).attr("idcorso");
+            var idprenotazione = $(this).attr("id_prenotazione");
+            var ret = Elimina(idcorso, idprenotazione);
+
+        });
+    });
+
+    function Prenota(idcorso, datacorso) {
+        $.ajax({
+            url: '/Home/Prenota',
+            dataType: 'json',
+            type: 'post',
+            async: true,
+            data: {
+                idcorso: idcorso,
+                datacorso: datacorso
+            },
+            success: function (ret, textStatus, jqXHR) {
+                if (ret != null && ret != "") {
+                    clearInterval(timer);
+                    timer = null;
+                    $("#" + idcorso).find(".divbtnprenota").addClass("d-none");
+                    $("#" + idcorso).find(".divbtnelimina").removeClass("d-none").attr("id_prenotazione", ret);
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                
+            }
+        });
+    }
+
+    function Elimina(idcorso, idprenotazione) {
+        $.ajax({
+            url: '/Home/Elimina',
+            dataType: 'json',
+            type: 'post',
+            async: true,
+            data: {
+                idprenotazione: idprenotazione
+            },
+            success: function (ret, textStatus, jqXHR) {
+                if (ret == true) {
+                    clearInterval(timer);
+                    timer = null;
+                    $("#" + idcorso).find(".divbtnprenota").removeClass("d-none");
+                    $("#" + idcorso).find(".divbtnelimina").addClass("d-none");
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+
+
+            }
+        });
+    }
+
+</script>
