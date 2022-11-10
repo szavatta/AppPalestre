@@ -63,7 +63,7 @@ namespace AppPalestre
             string ret = null;
             if ((string)obj["status"] == "2")
             {
-                ret = (string)obj["status"]["parametri"]["prenotazione"]["id_prenotazione"];
+                ret = (string)obj["parametri"]["prenotazione"]["id_prenotazione"];
             }
 
             return (ret);

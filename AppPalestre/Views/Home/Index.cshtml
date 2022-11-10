@@ -9,14 +9,14 @@
             <h3 class="text-primary mt-2">@giorno.Datas</h3>
             @foreach (AppPalestre.Controllers.HomeController.Corso corso in giorno.Corsi)
             {
-                <div id="@corso.Id" class="bg-light">
+                <div id="@corso.Id" class="bg-light p-1">
                     <div><h5 class="mb-0 mt-2">@corso.Nome</h5></div>
                     <div>dalle @corso.Inizio alle @corso.Fine</div>
-                    <div class="divbtnelimina @(corso.IsPrenotato ? "d-none" : "")">
-                        <input idcorso="@corso.Id" datacorso="@giorno.Data" type="button" class="btnElimina btn btn-danger" value="ELIMINA" />
+                    <div class="divbtnelimina @(corso.IdPrenotazione == 0 ? "d-none" : "")">
+                        <input idprenotazione="@corso.IdPrenotazione" type="button" class="btnElimina btn btn-danger w-100" value="ELIMINA" />
                     </div>
-                    <div class="divbtnprenota @(corso.IsPrenotato ? "d-none" : "")">
-                        <input idcorso="@corso.Id" datacorso="@giorno.Data" type="button" class="btnPrenota btn btn-success" value="PRENOTA" />
+                    <div class="divbtnprenota @(corso.IdPrenotazione != 0 ? "d-none" : "")">
+                        <input idcorso="@corso.Id" datacorso="@giorno.Data" type="button" class="btnPrenota btn btn-success w-100" value="PRENOTA" />
                     </div>
                 </div>
             }
@@ -56,7 +56,7 @@
             e.preventDefault();
 
             var idcorso = $(this).attr("idcorso");
-            var idprenotazione = $(this).attr("id_prenotazione");
+            var idprenotazione = $(this).attr("idPrenotazione");
             var ret = Elimina(idcorso, idprenotazione);
 
         });
@@ -74,10 +74,11 @@
             },
             success: function (ret, textStatus, jqXHR) {
                 if (ret != null && ret != "") {
-                    clearInterval(timer);
-                    timer = null;
-                    $("#" + idcorso).find(".divbtnprenota").addClass("d-none");
-                    $("#" + idcorso).find(".divbtnelimina").removeClass("d-none").attr("id_prenotazione", ret);
+                    location.reload();
+                    //clearInterval(timer);
+                    //timer = null;
+                    //$("#" + idcorso).find(".divbtnprenota").addClass("d-none");
+                    //$("#" + idcorso).find(".divbtnelimina").removeClass("d-none").attr("idprenotazione", ret);
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -97,10 +98,11 @@
             },
             success: function (ret, textStatus, jqXHR) {
                 if (ret == true) {
-                    clearInterval(timer);
-                    timer = null;
-                    $("#" + idcorso).find(".divbtnprenota").removeClass("d-none");
-                    $("#" + idcorso).find(".divbtnelimina").addClass("d-none");
+                    location.reload();
+                    //clearInterval(timer);
+                    //timer = null;
+                    //$("#" + idcorso).find(".divbtnprenota").removeClass("d-none");
+                    //$("#" + idcorso).find(".divbtnelimina").addClass("d-none");
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
