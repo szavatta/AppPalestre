@@ -9,16 +9,17 @@
             <h3 class="text-primary mt-2">@giorno.Datas</h3>
             @foreach (PalestreApi.Corso corso in giorno.Corsi)
             {
-                <div id="@corso.Id" class="bg-light p-1">
-                    <div><h5 class="mb-0 mt-2">@corso.Nome</h5></div>
-                    <div>dalle @corso.Inizio alle @corso.Fine</div>
-                    <div class="divbtnelimina @(corso.IdPrenotazione == 0 ? "d-none" : "")">
-                        <input idprenotazione="@corso.IdPrenotazione" type="button" class="btnElimina btn btn-danger w-100" value="ELIMINA" />
-                    </div>
-                    <div class="divbtnprenota @(corso.IdPrenotazione != 0 ? "d-none" : "")">
-                        <input idcorso="@corso.Id" datacorso="@giorno.Data" type="button" class="btnPrenota btn btn-success w-100" value="PRENOTA" />
-                    </div>
+            <div id="@corso.Id" class="bg-light p-1">
+                <div><h5 class="mb-0 mt-2">@corso.Nome</h5></div>
+                <div>dalle @corso.Inizio alle @corso.Fine</div>
+                <div>@corso.Frase</div>
+                <div class="divbtnelimina @(corso.IdPrenotazione == 0 ? "d-none" : "")">
+                    <input idprenotazione="@corso.IdPrenotazione" type="button" class="btnElimina btn btn-danger w-100" value="ELIMINA" />
                 </div>
+                <div class="divbtnprenota @(corso.IdPrenotazione != 0 ? "d-none" : "")">
+                    <input idcorso="@corso.Id" datacorso="@giorno.Data" type="button" class="btnPrenota btn btn-success w-100" value="PRENOTA" />
+                </div>
+            </div>
             }
         }
     }
