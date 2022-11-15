@@ -4,10 +4,10 @@
 
 <div class="">
     @{
-        foreach (AppPalestre.Controllers.HomeController.Giorno giorno in ViewBag.Giorni)
+        foreach (PalestreApi.Giorno giorno in ViewBag.Giorni)
         {
             <h3 class="text-primary mt-2">@giorno.Datas</h3>
-            @foreach (AppPalestre.Controllers.HomeController.Corso corso in giorno.Corsi)
+            @foreach (PalestreApi.Corso corso in giorno.Corsi)
             {
                 <div id="@corso.Id" class="bg-light p-1">
                     <div><h5 class="mb-0 mt-2">@corso.Nome</h5></div>

@@ -13,6 +13,10 @@ namespace AppPalestre
     {
         public static void Main(string[] args)
         {
+            IConfiguration config = new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false).Build();
+            Scheduler scheduler = new Scheduler();
+            scheduler.Fire(config);
             CreateHostBuilder(args).Build().Run();
         }
 

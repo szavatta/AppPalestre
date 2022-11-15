@@ -7,37 +7,29 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using AppPalestre.Models;
 using Newtonsoft.Json.Linq;
+using static AppPalestre.PalestreApi;
+using Microsoft.Extensions.Configuration;
 
 namespace AppPalestre.Controllers
 {
     public class HomeController : Controller
     {
-        public class Giorno
-        {
-            public DateTime Data { get; set; }
-            public string Datas { get; set; }
-            public List<Corso> Corsi { get; set; }
-        }
-
-        public class Corso
-        {
-            public int Id { get; set; }
-            public string Nome { get; set; }
-            public string Inizio { get; set; }
-            public string Fine { get; set; }
-            public int IdPrenotazione { get; set; }
-        }
-
         private readonly ILogger<HomeController> _logger;
+        IConfiguration _configuration;
+        string CodiceSessione;
+        string IdSede;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
+            CodiceSessione = _configuration.GetSection("CodiceSessione").Get<string>();
+            IdSede = _configuration.GetSection("IdSede").Get<string>();
         }
 
         public IActionResult Index()
         {
-            PalestreApi api = new PalestreApi();
+            PalestreApi api = new PalestreApi(CodiceSessione, IdSede);
             JObject pal = api.Palinsesti();
 
             List<Giorno> giorni = null;
@@ -82,7 +74,7 @@ namespace AppPalestre.Controllers
 
         public JsonResult Prenota(int idcorso, DateTime? datacorso)
         {
-            PalestreApi api = new PalestreApi();
+            PalestreApi api = new PalestreApi(CodiceSessione, IdSede);
             string id = api.Prenota(idcorso, datacorso?.ToString("yyyy-MM-dd"));
             
             return Json(id);
@@ -90,7 +82,8 @@ namespace AppPalestre.Controllers
 
         public JsonResult Elimina(int idprenotazione)
         {
-            PalestreApi api = new PalestreApi();
+            
+            PalestreApi api = new PalestreApi(CodiceSessione, IdSede);
             bool ret = api.Elimina(idprenotazione);
 
             return Json(ret);
