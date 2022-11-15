@@ -33,6 +33,7 @@ namespace AppPalestre
         {
             public int Id { get; set; }
             public string Nome { get; set; }
+            public string Frase { get; set; }
             public string Inizio { get; set; }
             public string Fine { get; set; }
             public int IdPrenotazione { get; set; }

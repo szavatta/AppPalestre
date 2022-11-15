@@ -14,22 +14,6 @@ namespace AppPalestre.Controllers
 {
     public class HomeController : Controller
     {
-        public class Giorno
-        {
-            public DateTime Data { get; set; }
-            public string Datas { get; set; }
-            public List<Corso> Corsi { get; set; }
-        }
-
-        public class Corso
-        {
-            public int Id { get; set; }
-            public string Nome { get; set; }
-            public string Inizio { get; set; }
-            public string Fine { get; set; }
-            public int IdPrenotazione { get; set; }
-            public string Frase { get; set; }
-        }
 
         private readonly ILogger<HomeController> _logger;
         IConfiguration _configuration;

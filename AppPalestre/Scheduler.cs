@@ -84,7 +84,7 @@ namespace AppPalestre
 
         private static void ScriviLog(string testo)
         {
-            using (StreamWriter sw = File.AppendText("log.txt"))
+            using (StreamWriter sw = File.AppendText("log.log"))
             {
                 sw.WriteLine(testo);
             }
