@@ -26,6 +26,7 @@ namespace AppPalestre.Controllers
             public string Inizio { get; set; }
             public string Fine { get; set; }
             public int IdPrenotazione { get; set; }
+            public string Frase { get; set; }
         }
 
         private readonly ILogger<HomeController> _logger;
@@ -58,7 +59,8 @@ namespace AppPalestre.Controllers
                             Nome = (string)orario["nome_corso"],
                             Inizio = (string)orario["orario_inizio"],
                             Fine = (string)orario["orario_fine"],
-                            IdPrenotazione = (int)orario["prenotazioni"]["utente_prenotato"] 
+                            IdPrenotazione = (int)orario["prenotazioni"]["utente_prenotato"],
+                            Frase = (string)orario["prenotazioni"]["frase"]
                         });
                     }
                     giorni.Add(g);
