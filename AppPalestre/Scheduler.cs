@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -11,6 +14,8 @@ namespace AppPalestre
     public class Scheduler
     {
         private static IConfiguration _configuration;
+        private System.Threading.Timer bTimer;
+
 
         class Corsi
         {
@@ -23,25 +28,77 @@ namespace AppPalestre
         {
             _configuration = configuration;
 
+            TimerCallback timerDelegate = new TimerCallback(tick);
+            bTimer = new System.Threading.Timer(timerDelegate, null, 60000, 60000);
 
-            //Dictionary<DayOfWeek, string> corsi = new Dictionary<DayOfWeek, string>();
-            //corsi.Add(DayOfWeek.Monday, "19:15");
-            //corsi.Add(DayOfWeek.Wednesday, "19:15");
-            //corsi.Add(DayOfWeek.Friday, "19:00");
-            //corsi.Add(DayOfWeek.Thursday, "09:00");
-
-            var aTimer = new Timer
-            {
-                Interval = 60000,
-                AutoReset = true,
-                Enabled = true
-            };
-            aTimer.Elapsed += OnTimedEvent;
+            //aTimer = new Timer()
+            //{
+            //    Interval = 60000,
+            //    Enabled = true                
+            //};
+            //aTimer.Elapsed += OnTimedEvent;
         }
+
+        void tick(Object obj)
+        {
+            try
+            {
+                try
+                {
+                    WebClient client = new WebClient();
+                    var test = client.DownloadStringTaskAsync("http://app.tdmitalia.it:450/home/privacy");
+                }
+                catch { }
+
+                ScriviLog($"{DateTime.Now} - Esecuzione timer");
+
+                List<Corsi> corsi = _configuration.GetSection("Corsi").Get<List<Corsi>>();
+                string CodiceSessione = _configuration.GetSection("CodiceSessione").Get<string>();
+                string IdSede = _configuration.GetSection("IdSede").Get<string>();
+
+                foreach (var corso in corsi)
+                {
+                    var orario = corso.Orario.Split(":");
+                    int ora = Convert.ToInt32(orario[0]);
+                    int minuto = Convert.ToInt32(orario[1]);
+
+                    DayOfWeek giornoset = (DayOfWeek)(((int)corso.Giorno - 2 + 7) % 7);
+
+                    if (DateTime.Now.DayOfWeek == giornoset && DateTime.Now.Hour == ora && DateTime.Now.Minute == minuto - 1)
+                    {
+                        ScriviLog($"{DateTime.Now} - Verifica corso '{corso.Nome}' con orario {corso.Giorno} {corso.Orario}");
+                        PalestreApi api = new PalestreApi(CodiceSessione, IdSede);
+                        var id = api.GetIdCorso(corso.Giorno, ora, minuto, corso.Nome);
+                        if (id != 0)
+                        {
+                            ScriviLog($"{DateTime.Now} - Trovato corso");
+                            bool ret = false;
+                            DateTime ini = DateTime.Now;
+                            while (!ret && (DateTime.Now - ini).TotalSeconds < 90)
+                            {
+                                ScriviLog($"{DateTime.Now} - Prenotazione corso");
+                                var rret = api.Prenota(id, DateTime.Now.ToString("yyyy-MM-dd"));
+                                ret = rret != null && rret != "";
+                                ScriviLog($"{DateTime.Now} - Corso {(!ret ? "non " : "")}prenotato!!");
+                            }
+                        }
+                        else
+                        {
+                            ScriviLog($"{DateTime.Now} - Corso non trovato");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ScriviLog($"{DateTime.Now} - Errore: {ex.Message}");
+            }
+        }
+
 
         private static void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
         {
-            ((Timer)source).Enabled = false;
+            //((Timer)source).Enabled = false;
 
             try
             {
@@ -87,14 +144,14 @@ namespace AppPalestre
                 ScriviLog($"{DateTime.Now} - Errore: {ex.Message}");
             }
 
-            ((Timer)source).Enabled = true;
+            //((Timer)source).Enabled = true;
         }
 
         private static void ScriviLog(string testo)
         {
             try
             {
-                using (StreamWriter sw = File.AppendText("log.log"))
+                using (StreamWriter sw = File.AppendText($"logs\\{DateTime.Now.ToString("yyyy-MM-dd")}.log"))
                 {
                     sw.WriteLine(testo);
                 }

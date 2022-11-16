@@ -15,6 +15,9 @@ namespace AppPalestre
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            Scheduler scheduler = new Scheduler();
+            scheduler.Fire(configuration);
         }
 
         public IConfiguration Configuration { get; }
