@@ -9,6 +9,7 @@ using AppPalestre.Models;
 using Newtonsoft.Json.Linq;
 using static AppPalestre.PalestreApi;
 using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace AppPalestre.Controllers
 {
@@ -84,7 +85,6 @@ namespace AppPalestre.Controllers
 
         public JsonResult Elimina(int idprenotazione)
         {
-            
             PalestreApi api = new PalestreApi(CodiceSessione, IdSede);
             bool ret = api.Elimina(idprenotazione);
 

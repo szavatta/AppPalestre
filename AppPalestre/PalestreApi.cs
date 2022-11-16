@@ -132,7 +132,7 @@ namespace AppPalestre
             return (ret);
         }
 
-        public int GetIdCorso(DayOfWeek WeekDay, int Hour, int minute)
+        public int GetIdCorso(DayOfWeek WeekDay, int ora, int minuto, string nome)
         {
             JObject pal = Palinsesti();
 
@@ -148,7 +148,7 @@ namespace AppPalestre
                             foreach (JToken orario in (JArray)giorno.SelectToken("orari_giorno"))
                             {
                                 var vorario = ((string)orario["orario_inizio"]).Split(":");
-                                if (Convert.ToInt32(vorario[0]) == Hour && Convert.ToInt32(vorario[1]) == minute)
+                                if ((string)orario["nome_corso"] == nome && Convert.ToInt32(vorario[0]) == ora && Convert.ToInt32(vorario[1]) == minuto)
                                 {
                                     return (int)orario["id_orario_palinsesto"];
                                 }
