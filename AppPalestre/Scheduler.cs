@@ -30,7 +30,12 @@ namespace AppPalestre
             _configuration = configuration;
 
             TimerCallback timerDelegate = new TimerCallback(tick);
+
+#if (DEBUG)
+            bTimer = new System.Threading.Timer(timerDelegate, null, 20000, 20000);
+#else
             bTimer = new System.Threading.Timer(timerDelegate, null, 60000, 60000);
+#endif
             tick(null);
             //aTimer = new Timer()
             //{
@@ -42,6 +47,8 @@ namespace AppPalestre
 
         void tick(Object obj)
         {
+            bTimer.Change(Timeout.Infinite, Timeout.Infinite);
+
             try
             {
                 ScriviLog($"{DateTime.Now} - Esecuzione timer");
@@ -65,6 +72,7 @@ namespace AppPalestre
 
                     DayOfWeek giornoset = (DayOfWeek)(((int)corso.Giorno - 2 + 7) % 7);
 
+                    //ScriviLog($"{DateTime.Now} - nome: '{corso.Nome}' giorno: '{corso.Giorno}' giorno-2: '{giornoset}' ora:{ora} minuto: {minuto}");
                     if (DateTime.Now.DayOfWeek == giornoset && DateTime.Now.Hour == ora && DateTime.Now.Minute == minuto - 1)
                     {
                         ScriviLog($"{DateTime.Now} - Verifica corso '{corso.Nome}' con orario {corso.Giorno} {corso.Orario}");
@@ -94,6 +102,12 @@ namespace AppPalestre
             {
                 ScriviLog($"{DateTime.Now} - Errore: {ex.Message}");
             }
+
+#if (DEBUG)
+            bTimer.Change(20000, 20000);
+#else
+            bTimer.Change(60000, 60000);
+#endif
         }
 
 

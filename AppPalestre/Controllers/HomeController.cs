@@ -95,7 +95,7 @@ namespace AppPalestre.Controllers
         {
             DirectoryInfo di = new DirectoryInfo("logs");
             var file = di.GetFiles().OrderByDescending(q => q.FullName).First();
-            string ret = $"Ultimo log: {file.LastWriteTime.ToString("dd/MM/yyyy HH:mm")}";
+            string ret = $"Ultimo log: {file.LastWriteTime.ToString("dd/MM/yyyy HH:mm:ss")}";
 
             return Json(ret);
         }
