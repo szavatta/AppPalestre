@@ -91,5 +91,14 @@ namespace AppPalestre.Controllers
             return Json(ret);
         }
 
+        public JsonResult VerificaTimer()
+        {
+            DirectoryInfo di = new DirectoryInfo("logs");
+            var file = di.GetFiles().OrderByDescending(q => q.FullName).First();
+            string ret = $"Ultimo log: {file.LastWriteTime.ToString("dd/MM/yyyy HH:mm")}";
+
+            return Json(ret);
+        }
+
     }
 }
