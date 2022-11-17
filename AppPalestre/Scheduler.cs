@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
@@ -30,7 +31,7 @@ namespace AppPalestre
 
             TimerCallback timerDelegate = new TimerCallback(tick);
             bTimer = new System.Threading.Timer(timerDelegate, null, 60000, 60000);
-
+            tick(null);
             //aTimer = new Timer()
             //{
             //    Interval = 60000,
@@ -43,14 +44,14 @@ namespace AppPalestre
         {
             try
             {
+                ScriviLog($"{DateTime.Now} - Esecuzione timer");
+
                 try
                 {
                     WebClient client = new WebClient();
                     var test = client.DownloadStringTaskAsync("http://app.tdmitalia.it:450/home/privacy");
                 }
                 catch { }
-
-                ScriviLog($"{DateTime.Now} - Esecuzione timer");
 
                 List<Corsi> corsi = _configuration.GetSection("Corsi").Get<List<Corsi>>();
                 string CodiceSessione = _configuration.GetSection("CodiceSessione").Get<string>();
