@@ -94,10 +94,25 @@ namespace AppPalestre.Controllers
         public JsonResult VerificaTimer()
         {
             DirectoryInfo di = new DirectoryInfo("logs");
-            var file = di.GetFiles().OrderByDescending(q => q.FullName).First();
-            string ret = $"Ultimo log: {file.LastWriteTime.ToString("dd/MM/yyyy HH:mm:ss")}";
+            FileInfo file = di.GetFiles().OrderByDescending(q => q.FullName).First();
+            string row = System.IO.File.ReadLines(file.FullName).Last();
+            string stato = "btn-secondary";
+            string txstato = "In pausa";
 
-            return Json(ret);
+            string ret = $"Ultimo log: {row.Substring(0, 19)}";
+            if (row.Substring(22).StartsWith("Verifica") || row.Substring(22).StartsWith("Trovato") || row.Substring(22).StartsWith("Prenotazione"))
+            {
+                stato = "btn-warning";
+                txstato = "In prenotazione";
+            } 
+            else if (row.Substring(22).StartsWith("Corso prenotato"))
+            {
+                stato = "btn-success";
+                txstato = "Corso prenotato";
+            }
+
+
+            return Json(new { data = ret, stato = stato, txstato = txstato });
         }
 
     }

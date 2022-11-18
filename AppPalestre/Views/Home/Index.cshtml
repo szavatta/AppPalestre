@@ -11,9 +11,10 @@
             </div>
             <div class="modal-body">
                 <h5 id="modalbody"></h5>
+                <button id="stato" type="button" class="btn btn-secondary w-100">&nbsp</button>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="btnCloseDialog" type="button" class="btn btn-secondary">Close</button>
             </div>
         </div>
     </div>
@@ -45,6 +46,7 @@
 <script type="text/javascript">
 
     var timer = null;
+    var timer1 = null;
     $(document).ready(function () {
 
         $('.btnPrenota').click(function (e) {
@@ -82,24 +84,40 @@
         $('#btnVerificaTimer').click(function (e) {
             e.preventDefault();
 
-            $.ajax({
-                url: '/Home/VerificaTimer',
-                dataType: 'json',
-                type: 'post',
-                async: false,
-                success: function (ret, textStatus, jqXHR) {
-                    $("#modalbody").html(ret);
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                }
-            });
-
+            VerificaTimer();
 
             $('#myModal').modal('show');
 
         });
 
+        $('#btnCloseDialog').click(function (e) {
+            e.preventDefault();
+
+            clearInterval(timer1);
+
+            $('#myModal').modal('hide');
+
+        });
+
     });
+
+    function VerificaTimer() {
+
+        clearInterval(timer1);
+        $.ajax({
+            url: '/Home/VerificaTimer',
+            dataType: 'json',
+            type: 'post',
+            async: false,
+            success: function (ret, textStatus, jqXHR) {
+                $("#modalbody").html(ret.data);
+                $("#stato").removeClass("btn-secondary btn-success btn-warning").addClass(ret.stato).html(ret.txstato);
+                timer1 = setInterval(function () { VerificaTimer() }, 5000);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+            }
+        });
+    }
 
     function Prenota(idcorso, datacorso) {
         $.ajax({

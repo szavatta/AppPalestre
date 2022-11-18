@@ -104,7 +104,7 @@ namespace AppPalestre
             }
 
 #if (DEBUG)
-            bTimer.Change(20000, 20000);
+            bTimer.Change(60000, 60000);
 #else
             bTimer.Change(60000, 60000);
 #endif
