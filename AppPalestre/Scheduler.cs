@@ -47,6 +47,7 @@ namespace AppPalestre
 
         void tick(Object obj)
         {
+
             bTimer.Change(Timeout.Infinite, Timeout.Infinite);
 
             try
@@ -70,10 +71,13 @@ namespace AppPalestre
                     int ora = Convert.ToInt32(orario[0]);
                     int minuto = Convert.ToInt32(orario[1]);
 
+                    DateTime dt1 = DateTime.Today.AddDays(2).AddHours(ora).AddMinutes(minuto);
+                    DateTime dt2 = DateTime.Today.AddHours(DateTime.Now.Hour).AddMinutes(DateTime.Now.Minute);
+
                     DayOfWeek giornoset = (DayOfWeek)(((int)corso.Giorno - 2 + 7) % 7);
 
                     //ScriviLog($"{DateTime.Now} - nome: '{corso.Nome}' giorno: '{corso.Giorno}' giorno-2: '{giornoset}' ora:{ora} minuto: {minuto}");
-                    if (DateTime.Now.DayOfWeek == giornoset && DateTime.Now.Hour == ora && DateTime.Now.Minute == minuto - 1)
+                    if (DateTime.Now.DayOfWeek == giornoset && dt2.Hour == dt1.AddMinutes(-1).Hour && dt2.Minute == dt1.AddMinutes(-1).Minute)
                     {
                         ScriviLog($"{DateTime.Now} - Verifica corso '{corso.Nome}' con orario {corso.Giorno} {corso.Orario}");
                         PalestreApi api = new PalestreApi(CodiceSessione, IdSede);
@@ -86,7 +90,7 @@ namespace AppPalestre
                             while (!ret && (DateTime.Now - ini).TotalSeconds < 90)
                             {
                                 ScriviLog($"{DateTime.Now} - Prenotazione corso");
-                                var rret = api.Prenota(id, DateTime.Now.ToString("yyyy-MM-dd"));
+                                var rret = api.Prenota(id, dt1.ToString("yyyy-MM-dd"));
                                 ret = rret != null && rret != "";
                                 ScriviLog($"{DateTime.Now} - Corso {(!ret ? "non " : "")}prenotato!!");
                             }
@@ -104,7 +108,7 @@ namespace AppPalestre
             }
 
 #if (DEBUG)
-            bTimer.Change(60000, 60000);
+            bTimer.Change(20000, 20000);
 #else
             bTimer.Change(60000, 60000);
 #endif
@@ -130,10 +134,12 @@ namespace AppPalestre
                     var orario = corso.Orario.Split(":");
                     int ora = Convert.ToInt32(orario[0]);
                     int minuto = Convert.ToInt32(orario[1]);
+                    DateTime dt1 = DateTime.Today.AddHours(ora).AddMinutes(minuto);
+                    DateTime dt2 = DateTime.Today.AddHours(DateTime.Now.Hour).AddMinutes(DateTime.Now.Minute);
 
                     DayOfWeek giornoset = (DayOfWeek)(((int)corso.Giorno - 2 + 7) % 7);
 
-                    if (DateTime.Now.DayOfWeek == giornoset && DateTime.Now.Hour == ora && DateTime.Now.Minute == minuto - 1)
+                    if (DateTime.Now.DayOfWeek == giornoset && dt1 == dt2.AddMinutes(-1))
                     {
                         ScriviLog($"{DateTime.Now} - Verifica corso '{corso.Nome}' con orario {corso.Giorno} {corso.Orario}");
                         PalestreApi api = new PalestreApi(CodiceSessione, IdSede);

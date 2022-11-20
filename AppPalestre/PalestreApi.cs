@@ -163,6 +163,49 @@ namespace AppPalestre
             return 0;
         }
 
+        public List<string> ListaPrenotati(int idcorso, DateTime datacorso)
+        {
+            JObject obj = null;
+            List<string> lista = new List<string>();
+
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://app.shaggyowl.com/funzioniapp/v405/lista_prenotati");
+
+                var postData = $"id_sede={IdSede}&codice_sessione={CodiceSessione}&id_orario_palinsesto={idcorso}&giorno={datacorso.ToShortDateString()}";
+                var data = Encoding.ASCII.GetBytes(postData);
+
+                request.Method = "POST";
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentLength = data.Length;
+
+                using (var stream = request.GetRequestStream())
+                {
+                    stream.Write(data, 0, data.Length);
+                }
+
+                var response = (HttpWebResponse)request.GetResponse();
+
+                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+                obj = JObject.Parse(responseString);
+
+                if ((string)obj["status"] == "2")
+                {
+
+                    foreach (JToken nominativo in (JArray)obj.SelectToken("$..lista_risultati"))
+                    {
+                        lista.Add((string)nominativo["nome"] + " " + (string)nominativo["cognome"]);
+                    }
+                }
+
+
+            }
+            catch { }
+
+            return lista;
+        }
+
     }
 
 
