@@ -16,19 +16,26 @@ namespace AppPalestre
     {
         private static IConfiguration _configuration;
         private System.Threading.Timer bTimer;
-
+        private Dictionary<string, string> persone;
 
         class Corsi
         {
             public DayOfWeek Giorno { get; set; }
             public string Orario { get; set; }
             public string Nome { get; set; }
+            public string CodiceSessione { get; set; }
+            public DateTime Day { get; set; }
+            public int IdCorso { get; set; }
+            public bool IsPrenotato { get; set; }
         }
 
         public void Fire(IConfiguration configuration)
         {
             _configuration = configuration;
-
+            persone = new Dictionary<string, string>()
+            {
+                { "mfAQXc4rOBOq4twO3CaO", "Stefano" }
+            };
             TimerCallback timerDelegate = new TimerCallback(tick);
 
 #if (DEBUG)
@@ -65,11 +72,15 @@ namespace AppPalestre
                 string CodiceSessione = _configuration.GetSection("CodiceSessione").Get<string>();
                 string IdSede = _configuration.GetSection("IdSede").Get<string>();
 
+                List<Corsi> corsidaprenotare = new List<Corsi>();   
+
                 foreach (var corso in corsi)
                 {
                     var orario = corso.Orario.Split(":");
                     int ora = Convert.ToInt32(orario[0]);
                     int minuto = Convert.ToInt32(orario[1]);
+
+                    corso.CodiceSessione = string.IsNullOrEmpty(corso.CodiceSessione) ? CodiceSessione : corso.CodiceSessione;
 
                     DateTime dt1 = DateTime.Today.AddDays(2).AddHours(ora).AddMinutes(minuto);
                     DateTime dt2 = DateTime.Today.AddHours(DateTime.Now.Hour).AddMinutes(DateTime.Now.Minute);
@@ -81,25 +92,41 @@ namespace AppPalestre
                     {
                         ScriviLog($"{DateTime.Now} - Verifica corso '{corso.Nome}' con orario {corso.Giorno} {corso.Orario}");
                         PalestreApi api = new PalestreApi(CodiceSessione, IdSede);
-                        var id = api.GetIdCorso(corso.Giorno, ora, minuto, corso.Nome);
+                        int id = api.GetIdCorso(corso.Giorno, ora, minuto, corso.Nome);
                         if (id != 0)
                         {
-                            ScriviLog($"{DateTime.Now} - Trovato corso");
-                            bool ret = false;
-                            DateTime ini = DateTime.Now;
-                            while (!ret && (DateTime.Now - ini).TotalSeconds < 90)
-                            {
-                                ScriviLog($"{DateTime.Now} - Prenotazione corso");
-                                var rret = api.Prenota(id, dt1.ToString("yyyy-MM-dd"));
-                                ret = rret != null && rret != "";
-                                ScriviLog($"{DateTime.Now} - Corso {(!ret ? "non " : "")}prenotato!!");
-                            }
+                            corsidaprenotare.Add(new Corsi {
+                                Nome = corso.Nome,
+                                CodiceSessione = corso.CodiceSessione,
+                                Day = dt1,
+                                IdCorso = id
+                            });
                         }
                         else
                         {
                             ScriviLog($"{DateTime.Now} - Corso non trovato");
                         }
                     }
+
+                }
+
+                if (corsidaprenotare.Count > 0)
+                {
+                    ScriviLog($"{DateTime.Now} - Trovato corso");
+                    bool ret = false;
+                    DateTime ini = DateTime.Now;
+                    while (corsidaprenotare.Where(q => q.IsPrenotato == false).Count() > 0 && (DateTime.Now - ini).TotalSeconds < 90)
+                    {
+                        foreach (var cdp in corsidaprenotare.Where(q => q.IsPrenotato == false))
+                        {
+                            PalestreApi api = new PalestreApi(cdp.CodiceSessione, IdSede);
+                            ScriviLog($"{DateTime.Now} - Prenotazione corso {cdp.Nome} per {persone[cdp.CodiceSessione]}");
+                            var rret = api.Prenota(cdp.IdCorso, cdp.Day.ToString("yyyy-MM-dd"));
+                            cdp.IsPrenotato = rret != null && rret != "";
+                            ScriviLog($"{DateTime.Now} - Corso {(!cdp.IsPrenotato ? "non " : "")}prenotato {cdp.Nome} per {persone[cdp.CodiceSessione]}!!");
+                        }
+                    }
+
                 }
             }
             catch (Exception ex)
