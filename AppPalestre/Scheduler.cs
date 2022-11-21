@@ -154,8 +154,6 @@ namespace AppPalestre
                 string CodiceSessione = _configuration.GetSection("CodiceSessione").Get<string>();
                 string IdSede = _configuration.GetSection("IdSede").Get<string>();
 
-                //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
-
                 foreach (var corso in corsi)
                 {
                     var orario = corso.Orario.Split(":");

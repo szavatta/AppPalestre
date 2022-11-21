@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppPalestre", "AppPalestre\AppPalestre.csproj", "{2A003A0B-6BF7-4715-BE92-E7C66E646337}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppPalestre", "AppPalestre\AppPalestre.csproj", "{2A003A0B-6BF7-4715-BE92-E7C66E646337}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest", "UnitTest\UnitTest.csproj", "{FB12F305-7D09-4903-B56D-724908323393}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{F95FE3FA-AAA9-40ED-AE50-553219DF8C85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{2A003A0B-6BF7-4715-BE92-E7C66E646337}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A003A0B-6BF7-4715-BE92-E7C66E646337}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A003A0B-6BF7-4715-BE92-E7C66E646337}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB12F305-7D09-4903-B56D-724908323393}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB12F305-7D09-4903-B56D-724908323393}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB12F305-7D09-4903-B56D-724908323393}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB12F305-7D09-4903-B56D-724908323393}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F95FE3FA-AAA9-40ED-AE50-553219DF8C85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F95FE3FA-AAA9-40ED-AE50-553219DF8C85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F95FE3FA-AAA9-40ED-AE50-553219DF8C85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F95FE3FA-AAA9-40ED-AE50-553219DF8C85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
