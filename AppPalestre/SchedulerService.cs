@@ -38,7 +38,8 @@ namespace AppPalestre
                     jobDataMap.Put("corso", corso);
                     jobDataMap.Put("IdSede", IdSede);
                     DateTime dt = DateTime.Today.AddDays(2).AddHours(Convert.ToInt32(corso.Orario.Split(":")[0])).AddMinutes(Convert.ToInt32(corso.Orario.Split(":")[1]));
-                    string cronExpression = $"50 {dt.AddMinutes(-1).Minute} {dt.AddMinutes(-1).Hour} ? * {corso.Giorno.ToString().ToUpper().Substring(0,3)} *";
+                    DayOfWeek giornoset = (DayOfWeek)(((int)corso.Giorno - 2 + 7) % 7);
+                    string cronExpression = $"50 {dt.AddMinutes(-1).Minute} {dt.AddMinutes(-1).Hour} ? * {giornoset.ToString().ToUpper().Substring(0,3)} *";
                     var job = JobBuilder.Create<QuartzTaskService>()
                         .WithIdentity($"ExecuteTaskServiceCallJob{cont}", "group1")
                         .UsingJobData(jobDataMap)
