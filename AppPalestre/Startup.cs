@@ -16,10 +16,10 @@ namespace AppPalestre
         {
             Configuration = configuration;
 
-            Scheduler scheduler = new Scheduler();
-            scheduler.Fire(configuration);
+            //Scheduler scheduler = new Scheduler();
+            //scheduler.Fire(configuration);
 
-            SchedulerService.StartAsync().GetAwaiter().GetResult();
+            QuartzSchedulerService.StartAsync(configuration).GetAwaiter().GetResult();
         }
 
         public IConfiguration Configuration { get; }

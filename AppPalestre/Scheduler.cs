@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using static AppPalestre.PalestreApi;
 
 namespace AppPalestre
 {
@@ -16,26 +17,14 @@ namespace AppPalestre
     {
         private static IConfiguration _configuration;
         private System.Threading.Timer bTimer;
-        private Dictionary<string, string> persone;
-
-        class Corsi
+        private Dictionary<string, string> persone = new Dictionary<string, string>()
         {
-            public DayOfWeek Giorno { get; set; }
-            public string Orario { get; set; }
-            public string Nome { get; set; }
-            public string CodiceSessione { get; set; }
-            public DateTime Day { get; set; }
-            public int IdCorso { get; set; }
-            public bool IsPrenotato { get; set; }
-        }
+            { "mfAQXc4rOBOq4twO3CaO", "Stefano" }
+        };
 
         public void Fire(IConfiguration configuration)
         {
             _configuration = configuration;
-            persone = new Dictionary<string, string>()
-            {
-                { "mfAQXc4rOBOq4twO3CaO", "Stefano" }
-            };
             TimerCallback timerDelegate = new TimerCallback(tick);
 
 #if (DEBUG)
@@ -59,7 +48,7 @@ namespace AppPalestre
 
             try
             {
-                ScriviLog($"{DateTime.Now} - Esecuzione timer");
+                Utils.ScriviLog($"{DateTime.Now} - Esecuzione timer");
 
                 try
                 {
@@ -70,6 +59,7 @@ namespace AppPalestre
 
                 List<Corsi> corsi = _configuration.GetSection("Corsi").Get<List<Corsi>>();
                 string CodiceSessione = _configuration.GetSection("CodiceSessione").Get<string>();
+                corsi.Where(q => string.IsNullOrEmpty(q.CodiceSessione)).ToList().ForEach(q => q.CodiceSessione = CodiceSessione);
                 string IdSede = _configuration.GetSection("IdSede").Get<string>();
 
                 List<Corsi> corsidaprenotare = new List<Corsi>();   
@@ -80,17 +70,15 @@ namespace AppPalestre
                     int ora = Convert.ToInt32(orario[0]);
                     int minuto = Convert.ToInt32(orario[1]);
 
-                    corso.CodiceSessione = string.IsNullOrEmpty(corso.CodiceSessione) ? CodiceSessione : corso.CodiceSessione;
-
                     DateTime dt1 = DateTime.Today.AddDays(2).AddHours(ora).AddMinutes(minuto);
                     DateTime dt2 = DateTime.Today.AddHours(DateTime.Now.Hour).AddMinutes(DateTime.Now.Minute);
 
                     DayOfWeek giornoset = (DayOfWeek)(((int)corso.Giorno - 2 + 7) % 7);
 
-                    //ScriviLog($"{DateTime.Now} - nome: '{corso.Nome}' giorno: '{corso.Giorno}' giorno-2: '{giornoset}' ora:{ora} minuto: {minuto}");
+                    //Utils.ScriviLog($"{DateTime.Now} - nome: '{corso.Nome}' giorno: '{corso.Giorno}' giorno-2: '{giornoset}' ora:{ora} minuto: {minuto}");
                     if (DateTime.Now.DayOfWeek == giornoset && dt2.Hour == dt1.AddMinutes(-1).Hour && dt2.Minute == dt1.AddMinutes(-1).Minute)
                     {
-                        ScriviLog($"{DateTime.Now} - Verifica corso '{corso.Nome}' con orario {corso.Giorno} {corso.Orario}");
+                        Utils.ScriviLog($"{DateTime.Now} - Verifica corso '{corso.Nome}' con orario {corso.Giorno} {corso.Orario}");
                         PalestreApi api = new PalestreApi(CodiceSessione, IdSede);
                         int id = api.GetIdCorso(corso.Giorno, ora, minuto, corso.Nome);
                         if (id != 0)
@@ -104,7 +92,7 @@ namespace AppPalestre
                         }
                         else
                         {
-                            ScriviLog($"{DateTime.Now} - Corso non trovato");
+                            Utils.ScriviLog($"{DateTime.Now} - Corso non trovato");
                         }
                     }
 
@@ -112,7 +100,7 @@ namespace AppPalestre
 
                 if (corsidaprenotare.Count > 0)
                 {
-                    ScriviLog($"{DateTime.Now} - Trovato corso");
+                    Utils.ScriviLog($"{DateTime.Now} - Trovato corso");
                     bool ret = false;
                     DateTime ini = DateTime.Now;
                     while (corsidaprenotare.Where(q => q.IsPrenotato == false).Count() > 0 && (DateTime.Now - ini).TotalSeconds < 90)
@@ -120,10 +108,10 @@ namespace AppPalestre
                         foreach (var cdp in corsidaprenotare.Where(q => q.IsPrenotato == false))
                         {
                             PalestreApi api = new PalestreApi(cdp.CodiceSessione, IdSede);
-                            ScriviLog($"{DateTime.Now} - Prenotazione corso {cdp.Nome} per {persone[cdp.CodiceSessione]}");
+                            Utils.ScriviLog($"{DateTime.Now} - Prenotazione corso {cdp.Nome} per {persone[cdp.CodiceSessione]}");
                             var rret = api.Prenota(cdp.IdCorso, cdp.Day.ToString("yyyy-MM-dd"));
                             cdp.IsPrenotato = rret != null && rret != "";
-                            ScriviLog($"{DateTime.Now} - Corso {(!cdp.IsPrenotato ? "non " : "")}prenotato {cdp.Nome} per {persone[cdp.CodiceSessione]}!!");
+                            Utils.ScriviLog($"{DateTime.Now} - Corso {(!cdp.IsPrenotato ? "non " : "")}prenotato {cdp.Nome} per {persone[cdp.CodiceSessione]}!!");
                         }
                     }
 
@@ -131,7 +119,7 @@ namespace AppPalestre
             }
             catch (Exception ex)
             {
-                ScriviLog($"{DateTime.Now} - Errore: {ex.Message}");
+                Utils.ScriviLog($"{DateTime.Now} - Errore: {ex.Message}");
             }
 
 #if (DEBUG)
@@ -148,7 +136,7 @@ namespace AppPalestre
 
             try
             {
-                ScriviLog($"{DateTime.Now} - Esecuzione timer");
+                Utils.ScriviLog($"{DateTime.Now} - Esecuzione timer");
 
                 List<Corsi> corsi = _configuration.GetSection("Corsi").Get<List<Corsi>>();
                 string CodiceSessione = _configuration.GetSection("CodiceSessione").Get<string>();
@@ -166,20 +154,20 @@ namespace AppPalestre
 
                     if (DateTime.Now.DayOfWeek == giornoset && dt1 == dt2.AddMinutes(-1))
                     {
-                        ScriviLog($"{DateTime.Now} - Verifica corso '{corso.Nome}' con orario {corso.Giorno} {corso.Orario}");
+                        Utils.ScriviLog($"{DateTime.Now} - Verifica corso '{corso.Nome}' con orario {corso.Giorno} {corso.Orario}");
                         PalestreApi api = new PalestreApi(CodiceSessione, IdSede);
                         var id = api.GetIdCorso(corso.Giorno, ora, minuto, corso.Nome);
                         if (id != 0)
                         {
-                            ScriviLog($"{DateTime.Now} - Trovato corso");
+                            Utils.ScriviLog($"{DateTime.Now} - Trovato corso");
                             bool ret = false;
                             DateTime ini = DateTime.Now;
                             while (!ret && (DateTime.Now - ini).TotalSeconds < 90)
                             {
-                                ScriviLog($"{DateTime.Now} - Prenotazione corso");
+                                Utils.ScriviLog($"{DateTime.Now} - Prenotazione corso");
                                 var rret = api.Prenota(id, DateTime.Now.ToString("yyyy-MM-dd"));
                                 ret = rret != null && rret != "";
-                                ScriviLog($"{DateTime.Now} - Corso {(!ret ? "non " : "")}prenotato!!");
+                                Utils.ScriviLog($"{DateTime.Now} - Corso {(!ret ? "non " : "")}prenotato!!");
                             }
                         }
                     }
@@ -187,22 +175,11 @@ namespace AppPalestre
             }
             catch(Exception ex) 
             {
-                ScriviLog($"{DateTime.Now} - Errore: {ex.Message}");
+                Utils.ScriviLog($"{DateTime.Now} - Errore: {ex.Message}");
             }
 
             //((Timer)source).Enabled = true;
         }
 
-        private static void ScriviLog(string testo)
-        {
-            try
-            {
-                using (StreamWriter sw = File.AppendText($"logs\\{DateTime.Now.ToString("yyyy-MM-dd")}.log"))
-                {
-                    sw.WriteLine(testo);
-                }
-            }
-            catch { }
-        }
     }
 }

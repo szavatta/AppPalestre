@@ -29,6 +29,17 @@ namespace AppPalestre
             public List<Corso> Corsi { get; set; }
         }
 
+        public class Corsi
+        {
+            public DayOfWeek Giorno { get; set; }
+            public string Orario { get; set; }
+            public string Nome { get; set; }
+            public string CodiceSessione { get; set; }
+            public DateTime Day { get; set; }
+            public int IdCorso { get; set; }
+            public bool IsPrenotato { get; set; }
+        }
+
         public class Corso
         {
             public int Id { get; set; }
