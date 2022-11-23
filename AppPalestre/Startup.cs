@@ -18,6 +18,8 @@ namespace AppPalestre
 
             Scheduler scheduler = new Scheduler();
             scheduler.Fire(configuration);
+
+            SchedulerService.StartAsync().GetAwaiter().GetResult();
         }
 
         public IConfiguration Configuration { get; }
