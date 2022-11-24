@@ -31,9 +31,15 @@ namespace AppPalestre
                     cdp.IsPrenotato = rret != null && rret != "";
                     Utils.ScriviLog($"{DateTime.Now} - Corso {(!cdp.IsPrenotato ? "non " : "")}prenotato {cdp.Nome} per {persone[cdp.CodiceSessione]}!!");
                 }
+
+                Task.Delay(10000).ContinueWith(task => {
+                    Utils.ScriviLog($"{DateTime.Now} - Attesa");
+                });
+
             });
             return task;
         }
+
     }
 
 

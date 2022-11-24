@@ -91,6 +91,7 @@ namespace AppPalestre
 
         public string Prenota(int idcorso, string datacorso)
         {
+            //Task.Delay(1000).Wait(); return "";
             string ret = null;
 
             try

@@ -21,6 +21,8 @@ namespace AppPalestre
         {
             try
             {
+                Utils.ScriviLog($"{DateTime.Now} - Application start");
+
                 List<Corsi> corsi = _configuration.GetSection("Corsi").Get<List<Corsi>>();
                 string CodiceSessione = _configuration.GetSection("CodiceSessione").Get<string>();
                 corsi.Where(q => string.IsNullOrEmpty(q.CodiceSessione)).ToList().ForEach(q => q.CodiceSessione = CodiceSessione);
