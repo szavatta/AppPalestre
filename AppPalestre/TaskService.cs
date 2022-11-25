@@ -16,7 +16,6 @@ namespace AppPalestre
         public Task Execute(IJobExecutionContext context)
         {
             JobDataMap dataMap = context.JobDetail.JobDataMap;
-
             PalestreApi.Corsi corso = (PalestreApi.Corsi)dataMap.Get("corso");
             string IdSede = dataMap.GetString("IdSede");
             corso.Day = DateTime.Today.AddDays(2);
@@ -26,18 +25,25 @@ namespace AppPalestre
                 DateTime ini = DateTime.Now;
                 while (!corso.IsPrenotato && (DateTime.Now - ini).TotalSeconds < 15)
                 {
-                    PalestreApi api = new PalestreApi(corso.CodiceSessione, IdSede);
-                    Utils.ScriviLog($"{DateTime.Now} - Prenotazione corso {corso.Nome} per {persone[corso.CodiceSessione]}");
-                    var rret = api.Prenota(corso.IdCorso, corso.Day.ToString("yyyy-MM-dd"));
-                    corso.IsPrenotato = rret != null && rret != "";
-                    Utils.ScriviLog($"{DateTime.Now} - Corso {(!corso.IsPrenotato ? "non " : "")}prenotato {corso.Nome} per {persone[corso.CodiceSessione]}!!");
+                    if (corso.IdCorso != 0)
+                    {
+                        PalestreApi api = new PalestreApi(corso.CodiceSessione, IdSede);
+                        Utils.ScriviLog($"{DateTime.Now} - Prenotazione corso {corso.Nome} per {persone[corso.CodiceSessione]}");
+                        var rret = api.Prenota(corso.IdCorso, corso.Day.ToString("yyyy-MM-dd"));
+                        corso.IsPrenotato = rret != null && rret != "";
+                        Utils.ScriviLog($"{DateTime.Now} - Corso {(!corso.IsPrenotato ? "non " : "")}prenotato {corso.Nome} per {persone[corso.CodiceSessione]}!!");
+                    }
+                    else
+                        Utils.ScriviLog($"{DateTime.Now} - Corso {corso.Nome} con Id=0");
                 }
 
-                Task.Delay(10000).ContinueWith(task => {
+                Task.Delay(10000).ContinueWith(task =>
+                {
                     Utils.ScriviLog($"{DateTime.Now} - Attesa");
                 });
 
             });
+            
             return task;
         }
 
