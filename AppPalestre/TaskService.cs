@@ -17,19 +17,20 @@ namespace AppPalestre
         {
             JobDataMap dataMap = context.JobDetail.JobDataMap;
 
-            PalestreApi.Corsi cdp = (PalestreApi.Corsi)dataMap.Get("corso");
+            PalestreApi.Corsi corso = (PalestreApi.Corsi)dataMap.Get("corso");
             string IdSede = dataMap.GetString("IdSede");
+            corso.Day = DateTime.Today.AddDays(2);
 
             var task = Task.Run(() =>
             {
                 DateTime ini = DateTime.Now;
-                while (!cdp.IsPrenotato && (DateTime.Now - ini).TotalSeconds < 15)
+                while (!corso.IsPrenotato && (DateTime.Now - ini).TotalSeconds < 15)
                 {
-                    PalestreApi api = new PalestreApi(cdp.CodiceSessione, IdSede);
-                    Utils.ScriviLog($"{DateTime.Now} - Prenotazione corso {cdp.Nome} per {persone[cdp.CodiceSessione]}");
-                    var rret = api.Prenota(cdp.IdCorso, cdp.Day.ToString("yyyy-MM-dd"));
-                    cdp.IsPrenotato = rret != null && rret != "";
-                    Utils.ScriviLog($"{DateTime.Now} - Corso {(!cdp.IsPrenotato ? "non " : "")}prenotato {cdp.Nome} per {persone[cdp.CodiceSessione]}!!");
+                    PalestreApi api = new PalestreApi(corso.CodiceSessione, IdSede);
+                    Utils.ScriviLog($"{DateTime.Now} - Prenotazione corso {corso.Nome} per {persone[corso.CodiceSessione]}");
+                    var rret = api.Prenota(corso.IdCorso, corso.Day.ToString("yyyy-MM-dd"));
+                    corso.IsPrenotato = rret != null && rret != "";
+                    Utils.ScriviLog($"{DateTime.Now} - Corso {(!corso.IsPrenotato ? "non " : "")}prenotato {corso.Nome} per {persone[corso.CodiceSessione]}!!");
                 }
 
                 Task.Delay(10000).ContinueWith(task => {

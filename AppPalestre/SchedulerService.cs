@@ -34,12 +34,17 @@ namespace AppPalestre
                     await scheduler.Start();
                 }
                 int cont = 0;
+
                 foreach (var corso in corsi)
                 {
+                    PalestreApi api = new PalestreApi(corso.CodiceSessione, IdSede);
+                    int ora = Convert.ToInt32(corso.Orario.Split(":")[0]);
+                    int minuto = Convert.ToInt32(corso.Orario.Split(":")[1]);
+                    corso.IdCorso = api.GetIdCorso(corso.Giorno, ora, minuto, corso.Nome);
                     JobDataMap jobDataMap = new JobDataMap();
                     jobDataMap.Put("corso", corso);
                     jobDataMap.Put("IdSede", IdSede);
-                    DateTime dt = DateTime.Today.AddDays(2).AddHours(Convert.ToInt32(corso.Orario.Split(":")[0])).AddMinutes(Convert.ToInt32(corso.Orario.Split(":")[1]));
+                    DateTime dt = DateTime.Today.AddDays(2).AddHours(ora).AddMinutes(minuto);
                     DayOfWeek giornoset = (DayOfWeek)(((int)corso.Giorno - 2 + 7) % 7);
                     string cronExpression = $"50 {dt.AddMinutes(-1).Minute} {dt.AddMinutes(-1).Hour} ? * {giornoset.ToString().ToUpper().Substring(0,3)} *";
                     var job = JobBuilder.Create<QuartzTaskService>()
