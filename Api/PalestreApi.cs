@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using static AppPalestre.PalestreApi;
 
 
 namespace AppPalestre
@@ -96,7 +97,7 @@ namespace AppPalestre
 
             try
             {
-                var request = (HttpWebRequest)WebRequest.Create("https://app.shaggyowl.com/funzioniapp/v405/prenotazione_new");
+                var request = (HttpWebRequest)WebRequest.Create("https://app.shaggyowl.com/funzioniapp/v407/prenotazione_new");
 
                 var postData = $"id_sede={IdSede}&codice_sessione={CodiceSessione}&id_orario_palinsesto={idcorso}&data={datacorso}";
                 var data = Encoding.ASCII.GetBytes(postData);
@@ -128,7 +129,7 @@ namespace AppPalestre
 
         public bool Elimina(int idprenotazione)
         {
-            var request = (HttpWebRequest)WebRequest.Create("https://app.shaggyowl.com/funzioniapp/v405/cancella_prenotazione");
+            var request = (HttpWebRequest)WebRequest.Create("https://app.shaggyowl.com/funzioniapp/v407/cancella_prenotazione");
 
             var postData = $"id_sede={IdSede}&codice_sessione={CodiceSessione}O&id_prenotazione={idprenotazione}&tipo=prenotazione";
             var data = Encoding.ASCII.GetBytes(postData);
@@ -191,7 +192,7 @@ namespace AppPalestre
 
             try
             {
-                var request = (HttpWebRequest)WebRequest.Create("https://app.shaggyowl.com/funzioniapp/v405/lista_prenotati");
+                var request = (HttpWebRequest)WebRequest.Create("https://app.shaggyowl.com/funzioniapp/v407/lista_prenotati");
 
                 var postData = $"id_sede={IdSede}&codice_sessione={CodiceSessione}&id_orario_palinsesto={idcorso}&giorno={datacorso.ToShortDateString()}";
                 var data = Encoding.ASCII.GetBytes(postData);
@@ -231,6 +232,46 @@ namespace AppPalestre
             catch { }
 
             return lista;
+        }
+
+        public Utente GetInfoUtente()
+        {
+            JObject obj = null;
+            Utente utente = new Utente();
+
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("https://app.shaggyowl.com/funzioniapp/v407/informazioni_utente");
+
+                var postData = $"id_sede={IdSede}&codice_sessione={CodiceSessione}";
+                var data = Encoding.ASCII.GetBytes(postData);
+
+                request.Method = "POST";
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentLength = data.Length;
+
+                using (var stream = request.GetRequestStream())
+                {
+                    stream.Write(data, 0, data.Length);
+                }
+
+                var response = (HttpWebResponse)request.GetResponse();
+
+                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+                obj = JObject.Parse(responseString);
+
+                if ((string)obj["status"] == "2")
+                {
+
+                    
+                }
+
+
+            }
+            catch { }
+
+            return utente;
         }
 
     }
