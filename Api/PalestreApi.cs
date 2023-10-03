@@ -14,6 +14,7 @@ namespace AppPalestre
 {
     public class PalestreApi
     {
+        public static List<Utente> ListaUtenti;
         public PalestreApi(string codiceSessione, string idSede)
         {
             CodiceSessione = codiceSessione;
@@ -57,6 +58,7 @@ namespace AppPalestre
             public string Cognome { get; set; }
             public int Stato { get; set; }
             public string UrlFoto { get; set; }
+            public string CodiceSessione { get; set; }
         }
 
         public JObject Palinsesti()

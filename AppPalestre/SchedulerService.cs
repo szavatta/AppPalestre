@@ -24,6 +24,7 @@ namespace AppPalestre
                 Utils.ScriviLog($"{DateTime.Now} - Application start");
 
                 List<Corsi> corsi = _configuration.GetSection("Corsi").Get<List<Corsi>>();
+                PalestreApi.ListaUtenti = _configuration.GetSection("Utenti").Get<List<Utente>>();
                 string CodiceSessione = _configuration.GetSection("CodiceSessione").Get<string>();
                 corsi.Where(q => string.IsNullOrEmpty(q.CodiceSessione)).ToList().ForEach(q => q.CodiceSessione = CodiceSessione);
                 string IdSede = _configuration.GetSection("IdSede").Get<string>();
@@ -56,6 +57,7 @@ namespace AppPalestre
                         .WithCronSchedule(cronExpression)
                         .Build();
                     await scheduler.ScheduleJob(job, trigger);
+                    Utils.ScriviLog($"{DateTime.Now} - Aggiunto scheduler per {corso.Nome} {giornoset.ToString().ToUpper().Substring(0, 3)} {ora} {minuto} utente {PalestreApi.ListaUtenti.Where(q => q.CodiceSessione == corso.CodiceSessione).FirstOrDefault()?.Nome} codice {corso.CodiceSessione}");
                     cont++;
                 }
 

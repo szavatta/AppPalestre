@@ -12,7 +12,7 @@ namespace AppPalestre
         {
             try
             {
-                using (StreamWriter sw = File.AppendText($"logs\\{DateTime.Now.ToString("yyyy-MM-dd")}.log"))
+                using (StreamWriter sw = File.AppendText($"{System.Environment.CurrentDirectory}\\logs\\{DateTime.Now.ToString("yyyy-MM-dd")}.log"))
                 {
                     sw.WriteLine(testo);
                 }
