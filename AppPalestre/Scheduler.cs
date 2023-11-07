@@ -58,6 +58,7 @@ namespace AppPalestre
                 catch { }
 
                 List<Corsi> corsi = _configuration.GetSection("Corsi").Get<List<Corsi>>();
+                List<Utente> utenti = _configuration.GetSection("Utenti").Get<List<Utente>>();
                 string CodiceSessione = _configuration.GetSection("CodiceSessione").Get<string>();
                 corsi.Where(q => string.IsNullOrEmpty(q.CodiceSessione)).ToList().ForEach(q => q.CodiceSessione = CodiceSessione);
                 string IdSede = _configuration.GetSection("IdSede").Get<string>();

@@ -8,7 +8,7 @@ namespace UnitTest
 {
     public class Tests
     {
-        string CodiceSessione = "2NJLK2EmAqxg69s5kgxw";
+        string CodiceSessione = "rmUQCNU3Fsl3ZlgFtAUs";// "2NJLK2EmAqxg69s5kgxw";
         string IdSede = "8628";
 
         [SetUp]
@@ -66,6 +66,15 @@ namespace UnitTest
 
         //    var bb = listadate.Select(q => q.ToString("dd-MM-yyyy") + " " + q.DayOfWeek).ToList();
 
+            Assert.Pass();
+        }
+
+        [Test]
+        public void GetInfoutente()
+        {
+            PalestreApi api = new PalestreApi(CodiceSessione, IdSede);
+            api.GetInfoUtente();
+        }
         //    Assert.Pass();
         //}
     }
