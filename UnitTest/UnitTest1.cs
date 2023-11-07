@@ -66,8 +66,8 @@ namespace UnitTest
 
         //    var bb = listadate.Select(q => q.ToString("dd-MM-yyyy") + " " + q.DayOfWeek).ToList();
 
-            Assert.Pass();
-        }
+        //    Assert.Pass();
+        //}
 
         [Test]
         public void GetInfoutente()
