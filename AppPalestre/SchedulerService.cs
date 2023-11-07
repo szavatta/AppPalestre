@@ -27,6 +27,7 @@ namespace AppPalestre
                 string CodiceSessione = _configuration.GetSection("CodiceSessione").Get<string>();
                 corsi.Where(q => string.IsNullOrEmpty(q.CodiceSessione)).ToList().ForEach(q => q.CodiceSessione = CodiceSessione);
                 string IdSede = _configuration.GetSection("IdSede").Get<string>();
+                int secondi = _configuration.GetSection("Secondi").Get<int>();
 
                 var scheduler = await StdSchedulerFactory.GetDefaultScheduler();
                 if (!scheduler.IsStarted)
@@ -46,7 +47,9 @@ namespace AppPalestre
                     jobDataMap.Put("IdSede", IdSede);
                     DateTime dt = DateTime.Today.AddDays(2).AddHours(ora).AddMinutes(minuto);
                     DayOfWeek giornoset = (DayOfWeek)(((int)corso.Giorno - 2 + 7) % 7);
-                    string cronExpression = $"50 {dt.AddMinutes(-1).Minute} {dt.AddMinutes(-1).Hour} ? * {giornoset.ToString().ToUpper().Substring(0,3)} *";
+                    string cronExpression = secondi< 0 ?
+                        $"{60 + secondi} {dt.AddMinutes(-1).Minute} {dt.AddMinutes(-1).Hour} ? * {giornoset.ToString().ToUpper().Substring(0, 3)} *" :
+                        $"{secondi} {dt.Minute} {dt.Hour} ? * {giornoset.ToString().ToUpper().Substring(0, 3)} *";
                     var job = JobBuilder.Create<QuartzTaskService>()
                         .WithIdentity($"ExecuteTaskServiceCallJob{cont}", "group1")
                         .UsingJobData(jobDataMap)
